@@ -65,6 +65,11 @@ public sealed partial class CalculatorListPage : DynamicListPage
         {
             // only skip once.
             skipQuerySearchText = string.Empty;
+
+            // When we skip, we still need to update the result display
+            // The result should show the new search text as a number (already calculated)
+            var result = QueryHelper.Query(newSearch, _settingsManager, false, HandleSave);
+            UpdateResult(result);
             return;
         }
 
