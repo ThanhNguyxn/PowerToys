@@ -70,9 +70,21 @@ public sealed partial class CalculatorListPage : DynamicListPage
 
         skipQuerySearchText = string.Empty;
 
-        _emptyItem.Subtitle = newSearch;
+        // Check if query ends with '=' and setting is enabled
+        bool replaceInput = _settingsManager.ReplaceInputOnEquals && newSearch.EndsWith('=');
+        string queryToProcess = replaceInput ? newSearch[..^1] : newSearch;
 
-        var result = QueryHelper.Query(newSearch, _settingsManager, false, HandleSave);
+        _emptyItem.Subtitle = queryToProcess;
+
+        var result = QueryHelper.Query(queryToProcess, _settingsManager, false, HandleSave);
+
+        // If replace input is enabled and we have a valid result, replace the search text with the result
+        if (replaceInput && result is not null && !string.IsNullOrEmpty(result.Title))
+        {
+            skipQuerySearchText = result.Title;
+            SearchText = result.Title;
+        }
+
         UpdateResult(result);
     }
 
